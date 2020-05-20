@@ -9,7 +9,7 @@ The workshop consists of the following three modules: Module 1 and Module 2 deal
 
 **[2. Fine-tuning Naver Movie Review Sentiment Classification with KoBERT on Amazon SageMaker](module2_kobert_nsmc_finetuning_sagemaker.ipynb)**: This module covers how to learn with SageMaker but excluded the detailed explanation (See module 1 for details). After this module, you will familiar with BERT fine-tuning on SageMaker.
 
-**[3. Deploying fine-tuned model to SageMaker Endpoint to perform Inference](module3_kobert_nsmc_deployment.ipynb)**: In this module, you will learn how to deploy a fine-tuned kobert model to the SageMaker endpoint. A great tutorial has already been introduced in the AWS Korea AIML blog and GitHub by Amazon Machine Learning Solutions Lab(https://github.com/aws-samples/kogpt2-sagemaker/blob/master/sagemaker-deploy-en.md). Based on this method, it is easy to perform endpoint deployment by making minor modifications.
+**[3. Deploying fine-tuned model to SageMaker Endpoint to perform Inference](module3_kobert_nsmc_deployment.ipynb)**: In this module, you will learn how to deploy a fine-tuned kobert model to the SageMaker endpoint. A great tutorial has already been introduced in the AWS Korea AIML blog and GitHub by Amazon Machine Learning Solutions Lab (https://github.com/aws-samples/kogpt2-sagemaker/blob/master/sagemaker-deploy-en.md). Based on this method, it is easy to perform endpoint deployment by making minor modifications.
 
 <br>
 
@@ -25,4 +25,4 @@ The workshop consists of the following three modules: Module 1 and Module 2 deal
 
 **[2. Amazon SageMaker에서 KoBERT를 이용한 네이버 영화 리뷰 감성 분류 fine-tuning](module2_kobert_nsmc_finetuning_sagemaker.ipynb)**: 이 모듈은 SageMaker를 사용하여 학습을 수행하지만 자세한 설명은 생략하였습니다. (자세한 설명은 모듈 1을 참조하세요.) 이 모듈을 수행하신 후에 SageMaker 상에서의 BERT fine-tuning에 친숙해질 수 있습니다.
 
-**[3. 추론을 수행하기 위해 fine-tuning된 모델을 SageMaker Endpoint에 배포](module3_kobert_nsmc_deployment.ipynb)**: 이 모듈에서는 fine-tuing 된 KoBERT 모델을 SageMaker Endpoint에 배포하는 방법을 배웁니다. AWS Korea AIML 블로그 및 GitHub에 Amazon Machine Learning Solutions Lab (https://github.com/aws-samples/kogpt2-sagemaker/blob/master/sagemaker-deploy-en.md)에서 작성한 훌륭한 튜토리얼이 이미 소개되었습니다. 이 튜토리얼을 기반으로 약간만 수정하면 여러분은 SageMaker 상에서 Endpoint 배포를 쉽게 수행할 수 있습니다.
+**[3. 추론을 수행하기 위해 fine-tuning된 모델을 SageMaker Endpoint에 배포](module3_kobert_nsmc_deployment.ipynb)**: 이 모듈에서는 fine-tuing 된 KoBERT 모델을 SageMaker Endpoint에 배포하는 방법을 배웁니다. AWS Korea AIML 블로그 및 GitHub에 Amazon Machine Learning Solutions Lab (https://github.com/aws-samples/kogpt2-sagemaker/blob/master/sagemaker-deploy-en.md) 에서 작성한 훌륭한 튜토리얼이 이미 소개되었습니다. 이 튜토리얼을 기반으로 약간만 수정하면 여러분은 SageMaker 상에서 Endpoint 배포를 쉽게 수행할 수 있습니다.
