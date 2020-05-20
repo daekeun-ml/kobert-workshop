@@ -1,5 +1,9 @@
 # Fine Tuning Naver Movie Review Sentiment Classification with KoBERT using GluonNLP
 
+***[Before getting started] This workshop assumes you have basic knowledge of Deep Learning and experience with Amazon SageMaker.***
+
+<br>
+
 In this workshop, you will learn how to fine-tune pre-trained KoBERT models on Amazon SageMaker and how to host trained models in the SageMaker Endpoint.
 
 The workshop consists of the following three modules: Module 1 and Module 2 deal with fine-tuning. For reference, you do not need to do both Module 1 and Module 2, you only need to perform one selectively. However, in order to proceed with module 3, either module 1 or module 2 must be performed.
@@ -23,9 +27,15 @@ $ sudo sh cuda_10.2.89_440.33.01_linux.run
 
 <br>
 
+***[시작하기 전] 이 워크샵은 딥러닝에 대한 기본적인 지식이 있고 Amazon SageMaker를 사용해본 경험이 있다고 가정합니다. 딥러닝에 대한 지식이 있지만 Amazon SageMaker 사용 경험이 없다면, 아래의 동영상들을 참조해 주세요.***
+- [Amazon SageMaker 오버뷰](https://www.youtube.com/watch?v=jF2BN98KBlg)
+- [Amazon SageMaker 데모](https://www.youtube.com/watch?v=miIVGlq6OUk)
+
+<br>
+
 이 워크샵에서 여려분은 Amazon SageMaker에서 사전 훈련된 KoBERT 모델을 fine-tuning하는 방법과 훈련된 모델을 SageMaker Endpoint에 호스팅하는 방법을 배우게 됩니다.
 
-워크샵은 다음 세 가지 모듈로 구성됩니다. 모듈 1 및 모듈 2는 fine-tuning을 수행합니다. 참고로 모듈 1과 모듈 2를 모두 수행할 필요는 없으며 상황에 따라 1개 모듈만 선택적으로 수행할 수 있습니다. 그러나 모듈 3을 진행하려면, 모듈 1 또는 모듈 2 중 하나를 반드시 수행해야 합니다.
+워크샵은 다음 세 가지 모듈로 구성됩니다. 모듈 1 및 모듈 2는 fine-tuning을 수행합니다. 참고로 모듈 1과 모듈 2를 모두 수행할 필요는 없으며, 상황에 따라 1개 모듈만 선택적으로 수행할 수 있습니다. 그러나 모듈 3을 진행하려면, 모듈 1 또는 모듈 2 중 하나를 반드시 수행해야 합니다.
 
 **[1. KoBERT를 이용한 네이버 영화 리뷰 감성 분류 fine-tuning](module1_kobert_nsmc_finetuning.ipynb)**: 이 모듈에서는 미리 훈련된 BERT 모델을 사용하여 네이버 영화 리뷰 감성을 분류하는 데 초점을 맞춥니다. 이 모듈은 SageMaker API를 사용하지 않으므로 GPU와 CUDA 10.1 이상의 toolkit이 필요합니다. 이 모듈을 수행하신 후에 BERT의 fine-tuning 방법에 친숙해질 수 있습니다.
 
