@@ -11,7 +11,8 @@ The workshop consists of the following three modules: Module 1 and Module 2 deal
 
 **[1. Fine-tuning Naver Movie Review Sentiment Classification with KoBERT](module1_kobert_nsmc_finetuning.ipynb)**: In this module, we focus on fine-tuning with the pre-trained BERT model to classify Naver movie review sentiment. Since this module does not use the SageMaker API, you need to have at least GPU as well as CUDA toolkit >= 10.1. After this module, you will get familiar with BERT fine-tuning.
 
-*[Note] The cuda toolkit version of SageMaker as of May 20, 2020 is 10.0, so CUDA upgrade is required. Please run the shell script below in terminal mode.*
+*[Note] 
+The CUDA toolkit version of SageMaker as of May 2020 is 10.0, so CUDA upgrade is required. No CUDA upgrade is required for SageMaker Studio, since CUDA version is 10.1 as of May 2020. If you want to run the notebook on SageMaker, please run the shell script below in terminal mode.*
 ```shell
 $ wget http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run 
 $ sudo sh cuda_10.2.89_440.33.01_linux.run
@@ -27,7 +28,7 @@ $ sudo sh cuda_10.2.89_440.33.01_linux.run
 
 <br>
 
-***[시작하기 전] 이 워크샵은 딥러닝에 대한 기본적인 지식이 있고 Amazon SageMaker를 사용해본 경험이 있다고 가정합니다. 딥러닝에 대한 지식이 있지만 Amazon SageMaker 사용 경험이 없다면, 아래의 동영상들을 참조해 주세요.***
+***[시작하기 전] 이 워크샵은 딥러닝에 대한 기본적인 지식이 있고 Amazon SageMaker를 사용해 본 경험이 있다고 가정합니다. 딥러닝에 대한 지식이 있지만 Amazon SageMaker 사용 경험이 없다면, 아래의 동영상들을 참조해 주세요.***
 - [Amazon SageMaker 오버뷰](https://www.youtube.com/watch?v=jF2BN98KBlg)
 - [Amazon SageMaker 데모](https://www.youtube.com/watch?v=miIVGlq6OUk)
 
@@ -39,7 +40,7 @@ $ sudo sh cuda_10.2.89_440.33.01_linux.run
 
 **[1. KoBERT를 이용한 네이버 영화 리뷰 감성 분류 fine-tuning](module1_kobert_nsmc_finetuning.ipynb)**: 이 모듈에서는 미리 훈련된 BERT 모델을 사용하여 네이버 영화 리뷰 감성을 분류하는 데 초점을 맞춥니다. 이 모듈은 SageMaker API를 사용하지 않으므로 GPU와 CUDA 10.1 이상의 toolkit이 필요합니다. 이 모듈을 수행하신 후에 BERT의 fine-tuning 방법에 친숙해질 수 있습니다.
 
-*[Note] 2020년 5월 20일 시점에서의 SageMaker 노트북 인스턴스 CUDA toolkit 버전은 10.0이므로 CUDA 업그레이드가 필요합니다. 터미널 모드에서 아래 셀 스크립트를 실행해 주세요.*
+*[Note] 2020년 5월 시점에서의 SageMaker 노트북 인스턴스 CUDA toolkit 버전은 10.0이므로 CUDA 업그레이드가 필요합니다. 단, SageMaker Studio는 이미 CUDA버전이 10.1이기 때문에 CUDA 업그레이드가 필요 없습니다. 본 노트북을 SageMaker 상에서 실행하고 싶다면, 터미널 모드에서 아래 셀 스크립트를 실행해 주세요.*
 ```shell
 $ wget http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run 
 $ sudo sh cuda_10.2.89_440.33.01_linux.run
