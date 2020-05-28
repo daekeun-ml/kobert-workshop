@@ -11,9 +11,9 @@ from mxnet import nd
 import subprocess
 import sys
 
-# Install/Update Packages
-subprocess.call([sys.executable, '-m', 'pip', 'install', 'gluonnlp', 'torch', 'sentencepiece', 
-                 'onnxruntime', 'transformers', 'git+https://git@github.com/SKTBrain/KoBERT.git@master'])
+# # Install/Update Packages
+# subprocess.call([sys.executable, '-m', 'pip', 'install', 'gluonnlp', 'torch', 'sentencepiece', 
+#                  'onnxruntime', 'transformers', 'git+https://git@github.com/SKTBrain/KoBERT.git@master'])
 
 
 from mxnet.gluon import nn, rnn

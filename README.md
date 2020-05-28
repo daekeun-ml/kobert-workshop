@@ -20,7 +20,12 @@ $ sudo sh cuda_10.2.89_440.33.01_linux.run
 
 **[2. Fine-tuning Naver Movie Review Sentiment Classification with KoBERT on Amazon SageMaker](module2_kobert_nsmc_finetuning_sagemaker.ipynb)**: This module covers how to learn with SageMaker but excluded the detailed explanation (See module 1 for details). After this module, you will familiar with BERT fine-tuning on SageMaker.
 
-**[3. Deploying fine-tuned model to SageMaker Endpoint to perform Inference](module3_kobert_nsmc_deployment.ipynb)**: In this module, you will learn how to deploy a fine-tuned kobert model to the SageMaker endpoint. A great tutorial has already been introduced in the AWS Korea AIML blog and GitHub by Amazon Machine Learning Solutions Lab (https://github.com/aws-samples/kogpt2-sagemaker/blob/master/sagemaker-deploy-en.md). Based on this method, it is easy to perform endpoint deployment by making minor modifications.
+**[3. Deploying fine-tuned model to SageMaker Endpoint to perform Inference](module3.1_kobert_nsmc_deployment_local.ipynb)**: In this module, you will learn how to deploy a fine-tuned kobert model to the SageMaker endpoint. 
+We recommend that you test your deployment code in local mode first, without provisioning for deployment. If you have done enough testing, you can deploy EC2 instances for deployment. You can also Build Your Own Container(BYOC) if needed, and a great tutorial on this can be found on the [AWS Korea AIML blog](https://aws.amazon.com/ko/blogs/korea/deploy-kogpt2-model-mxnet-amazon-sagemaker/) and [GitHub](https://github.com/aws-samples/kogpt2-sagemaker/blob/master/sagemaker-deploy-en.md). Based on this tutorial, you can easily deploy Endpoint on SageMaker with minor modifications.
+
+- [Local Mode](module3.1_kobert_nsmc_deployment_local.ipynb)
+- [Script Mode](module3.2_kobert_nsmc_deployment_script.ipynb)
+- [Bring Your Own Container(BYOC)](module3.3_kobert_nsmc_deployment_byoc.ipynb)
 
 <br>
 
@@ -48,4 +53,8 @@ $ sudo sh cuda_10.2.89_440.33.01_linux.run
 
 **[2. Amazon SageMaker에서 KoBERT를 이용한 네이버 영화 리뷰 감성 분류 fine-tuning](module2_kobert_nsmc_finetuning_sagemaker.ipynb)**: 이 모듈은 SageMaker를 사용하여 학습을 수행하지만 자세한 설명은 생략하였습니다. (자세한 설명은 모듈 1을 참조하세요.) 이 모듈을 수행하신 후에 SageMaker 상에서의 BERT fine-tuning에 친숙해질 수 있습니다.
 
-**[3. 추론을 수행하기 위해 fine-tuning된 모델을 SageMaker Endpoint에 배포](module3_kobert_nsmc_deployment.ipynb)**: 이 모듈에서는 fine-tuning된 KoBERT 모델을 SageMaker Endpoint에 배포하는 방법을 배웁니다. AWS Korea AIML 블로그 및 GitHub에 Amazon Machine Learning Solutions Lab (https://github.com/aws-samples/kogpt2-sagemaker/blob/master/sagemaker-deploy-en.md) 에서 작성한 훌륭한 튜토리얼이 이미 소개되었습니다. 이 튜토리얼을 기반으로 약간만 수정하면 여러분은 SageMaker 상에서 Endpoint 배포를 쉽게 수행할 수 있습니다.
+**[3. 추론을 수행하기 위해 fine-tuning된 모델을 SageMaker Endpoint에 배포](module3_kobert_nsmc_deployment.ipynb)**: 이 모듈에서는 fine-tuning된 KoBERT 모델을 SageMaker Endpoint에 배포하는 방법을 배웁니다. 먼저 배포용 프로비저닝 없이 로컬 모드에서 먼저 배포 코드를 테스트해 보고, 충분한 테스트를 거쳤다면 배포용 EC2 인스턴스를 프로비저닝하는 방법을 추천합니다. 또한 필요 시,여러분의 도커 컨테이너를 직접 빌드할 수 있으며 이에 대한 훌륭한 튜토리얼이 [AWS Korea AIML 블로그](https://aws.amazon.com/ko/blogs/korea/deploy-kogpt2-model-mxnet-amazon-sagemaker/) 및 [GitHub](https://github.com/aws-samples/kogpt2-sagemaker/blob/master/sagemaker-deploy-en.md) 에 소개되었습니다. 이 튜토리얼을 기반으로 약간만 수정하면 여러분은 SageMaker 상에서 Endpoint 배포를 쉽게 수행할 수 있습니다.
+
+- [Local Mode](module3.1_kobert_nsmc_deployment_local.ipynb)
+- [Script Mode](module3.2_kobert_nsmc_deployment_script.ipynb)
+- [Bring Your Own Container(BYOC)](module3.3_kobert_nsmc_deployment_byoc.ipynb)

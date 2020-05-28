@@ -2,10 +2,9 @@ import os
 import json
 import glob
 import time
-
-# Install/Update Packages
-subprocess.call([sys.executable, '-m', 'pip', 'install', 'gluonnlp', 'torch', 'sentencepiece', 
-                 'onnxruntime', 'transformers', 'git+https://git@github.com/SKTBrain/KoBERT.git@master'])
+# # Install/Update Packages
+# subprocess.call([sys.executable, '-m', 'pip', 'install', 'gluonnlp', 'torch', 'sentencepiece', 
+#                 'onnxruntime', 'transformers', 'git+https://git@github.com/SKTBrain/KoBERT.git@master'])
 
 import mxnet as mx
 import gluonnlp as nlp

@@ -1,0 +1,5 @@
+gluonnlp
+sentencepiece
+onnxruntime
+transformers
+git+https://git@github.com/SKTBrain/KoBERT.git@master
