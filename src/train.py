@@ -11,10 +11,14 @@ from mxnet import nd
 import subprocess
 import sys
 
+import logging
+import logging.handlers
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 # # Install/Update Packages
 # subprocess.call([sys.executable, '-m', 'pip', 'install', 'gluonnlp', 'torch', 'sentencepiece', 
 #                  'onnxruntime', 'transformers', 'git+https://git@github.com/SKTBrain/KoBERT.git@master'])
-
 
 from mxnet.gluon import nn, rnn
 from mxnet import gluon, autograd
@@ -29,11 +33,14 @@ from bert import BERTDatasetTransform, BERTDataset, BERTClassifier
 import warnings
 warnings.filterwarnings('ignore')
 
+def set_seed(seed=42):
+    np.random.seed(seed)
+    random.seed(seed)
+    mx.random.seed(seed)
+
 def get_dataloaders(dataset_train, dataset_test, vocab, batch_size, 
                     max_len=64, class_labels=['0', '1']):
-    from kobert.mxnet_kobert import get_mxnet_kobert_model
-    from kobert.utils import get_tokenizer
-    
+
     tokenizer = get_tokenizer()
     bert_tokenizer = nlp.data.BERTSPTokenizer(tokenizer, vocab, lower=False)
 
@@ -79,30 +86,36 @@ def evaluate_accuracy(model, data_iter, loss_function, ctx):
 
     for batch_id, (token_ids, segment_ids, valid_length, label) in enumerate(data_iter):
 
-        token_ids = token_ids.as_in_context(ctx)
-        valid_length = valid_length.as_in_context(ctx)
-        segment_ids = segment_ids.as_in_context(ctx)
-        label = label.as_in_context(ctx)
+        # Load the data to the GPUs
+        token_ids_ = gluon.utils.split_and_load(token_ids, ctx, even_split=False)
+        valid_length_ = gluon.utils.split_and_load(valid_length, ctx, even_split=False)
+        segment_ids_ = gluon.utils.split_and_load(segment_ids, ctx, even_split=False)
+        label_ = gluon.utils.split_and_load(label, ctx, even_split=False)
 
-        out = model(token_ids, segment_ids, valid_length.astype('float32'))
-        ls = loss_function(out, label).mean()
-        total_loss += ls.asscalar()
-
-        acc.update(preds=out, labels=label)
+        for t, v, s, l in zip(token_ids_, valid_length_, segment_ids_, label_):
+            # Forward computation
+            out = model(t, s, v.astype('float32'))
+            ls = loss_function(out, l).mean()
+            total_loss += ls.asscalar()
+            acc.update(preds=out, labels=l)
 
     avg_acc = acc.get()[1]
     avg_loss = total_loss / batch_id
 
-    print('Validation loss={:.4f}, acc={:.3f}'.format(avg_loss, avg_acc))
+    logger.info('Validation loss={:.4f}, acc={:.3f}'.format(avg_loss, avg_acc))
 
     return avg_acc, avg_loss    
 
 
 def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_dir, model_output_dir):
 
-    ctx = mx.gpu()
+    num_gpus = mx.context.num_gpus()
+    num_gpus = 1
+    
+    batch_size *= num_gpus
+    ctx = [mx.gpu(i) for i in range(num_gpus)]
       
-    print("=== Load pre-trained KoBERT model ===")
+    logger.info("=== Load pre-trained KoBERT model ===")
     
     # Load pre-trained KoBERT model
     bert_base, vocab = get_mxnet_kobert_model(use_decoder=False, use_classifier=False, ctx=ctx)
@@ -119,25 +132,21 @@ def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_
     loss_function.hybridize(static_alloc=True)
     metric = mx.metric.Accuracy()
     
-    print("=== Getting Data ===")
- 
+    logger.info("=== Getting Data ===")
+   
     train_file = os.path.join(train_dir, 'train.txt')
     validation_file = os.path.join(validation_dir, 'validation.txt')
-    print(train_file)
-    print(validation_file)
+
     dataset_train = nlp.data.TSVDataset(train_file, field_indices=[1,2], num_discard_samples=1)
     dataset_test = nlp.data.TSVDataset(validation_file, field_indices=[1,2], num_discard_samples=1)
 
     train_dataloader, test_dataloader, bert_tokenizer = get_dataloaders(dataset_train, dataset_test, vocab, batch_size)
 
-    num_train_examples = len(dataset_train)
-    step_num = 0
     all_model_params = bert_classifier.collect_params()
+    trainer = gluon.Trainer(all_model_params, 'bertadam',
+                            {'learning_rate': lr, 'epsilon': 1e-9, 'wd':0.01, 'clip_gradient': 1},
+                           kvstore='device')
 
-    trainer = gluon.Trainer(all_model_params, 'adam',
-                               {'learning_rate': lr, 'epsilon': 1e-9})
-
-    
     # Weight Decay is not applied to LayerNorm and Bias.
     for _, v in bert_classifier.collect_params('.*beta|.*gamma|.*bias').items():
         v.wd_mult = 0.0
@@ -145,15 +154,19 @@ def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_
     # Collect all differentiable parameters
     # `grad_req == 'null'` indicates no gradients are calculated (e.g. constant parameters)
     # The gradients for these params are clipped later
-    params = [p for p in bert_classifier.collect_params().values() 
-              if p.grad_req != 'null']
+    params = [p for p in all_model_params.values() if p.grad_req != 'null']  
 
+    # Learning rate warmup parameters
+    num_train_examples = len(dataset_train)
+    num_train_steps = int(num_train_examples / batch_size * num_epochs) 
+    warmup_ratio = 0.1
+    num_warmup_steps = int(num_train_steps * warmup_ratio)
+    logger.info("Training steps={}, warmup_steps={}".format(num_train_steps, num_warmup_steps))
 
-    ### 
-    print("=== Start Training ===")
-
+    logger.info("=== Start Training ===")
     training_stats = []
     step_num = 0
+    set_seed()  
 
     # Measure the total training time for the whole run.
     total_t0 = time.time()
@@ -171,52 +184,63 @@ def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_
         total_loss = 0
         
         for batch_id, (token_ids, segment_ids, valid_length, label) in enumerate(train_dataloader):
-
-            with mx.autograd.record():
-
-                # Load the data to the GPU.
-                token_ids = token_ids.as_in_context(ctx)
-                valid_length = valid_length.as_in_context(ctx)
-                segment_ids = segment_ids.as_in_context(ctx)
-                label = label.as_in_context(ctx)
-
-                # Forward computation
-                out = bert_classifier(token_ids, segment_ids, valid_length.astype('float32'))
-
-                # Compute loss
-                ls = loss_function(out, label).mean()
-
-            # Perform a backward pass to calculate the gradients
-            ls.backward()
             
-            # Gradient clipping
-            # step() can be used for normal parameter updates, but if we apply gradient clipping, 
-            # you need to manaully call allreduce_grads() and update() separately.            
-            trainer.allreduce_grads()
-            nlp.utils.clip_grad_global_norm(params, 1)
-            trainer.update(1)
+            # Learning rate warmup
+            if step_num < num_warmup_steps:
+                new_lr = lr * step_num / num_warmup_steps
+            else:
+                non_warmup_steps = step_num - num_warmup_steps
+                offset = non_warmup_steps / (num_train_steps - num_warmup_steps)
+                new_lr = lr - offset * lr
+            trainer.set_learning_rate(new_lr)
+#             new_lr = scheduler(step_num)
+#             trainer.set_learning_rate(new_lr)
+    
+            losses = []
+            with mx.autograd.record():
+                # Load the data to the GPUs.
+                token_ids_ = gluon.utils.split_and_load(token_ids, ctx, even_split=False)
+                valid_length_ = gluon.utils.split_and_load(valid_length, ctx, even_split=False)
+                segment_ids_ = gluon.utils.split_and_load(segment_ids, ctx, even_split=False)
+                label_ = gluon.utils.split_and_load(label, ctx, even_split=False)                
 
-            step_loss += ls.asscalar()
-            total_loss += ls.asscalar()
-            metric.update([label], [out])
+                for t, v, s, l in zip(token_ids_, valid_length_, segment_ids_, label_):
+                    # Forward computation
+                    out = bert_classifier(t, s, v.astype('float32'))
+                    ls = loss_function(out, l)
+                    losses.append(ls)
+                    metric.update([l], [out])             
+
+            # Perform a backward pass to calculate the gradients        
+            for ls in losses:
+                ls.backward()  
+
+            trainer.step(batch_size)
+            
+            # Sum losses over all devices
+            sum_loss = (sum([l.sum().asscalar() for l in losses]))/batch_size
+            step_loss += sum_loss
+            total_loss += sum_loss
+            step_num += 1            
+            #metric.update([label], [out])             
 
             # Printing vital information
             if (batch_id + 1) % (log_interval) == 0:
-                print('[Epoch {} Batch {}/{}] loss={:.4f}, lr={:.7f}, acc={:.3f}'
+                logger.info('[Epoch {} Batch {}/{}] loss={:.4f}, lr={:.7f}, acc={:.3f}'
                              .format(epoch_id, batch_id + 1, len(train_dataloader),
                                      step_loss / log_interval,
                                      trainer.learning_rate, metric.get()[1]))
                 step_loss = 0
 
             train_avg_acc = metric.get()[1]
-            train_avg_loss = total_loss / batch_id
+            train_avg_loss = total_loss
             total_loss = 0
 
         # Measure how long this epoch took.
         train_time = format_time(time.time() - t0)
 
         # === Validation phase ===
-        print('=== Start Validation ===')
+        logger.info('=== Start Validation ===')
 
         # Measure how long the validation epoch takes.    
         t0 = time.time()    
@@ -228,7 +252,7 @@ def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_
         validation_time = format_time(time.time() - t0)
 
         # Record all statistics from this epoch.
-        print('Epoch {} evaluation result: train_acc {}, train_loss {}, valid_acc {}, valid_loss {}'
+        logger.info('Epoch {} evaluation result: train_acc {}, train_loss {}, valid_acc {}, valid_loss {}'
                      .format(epoch_id, train_avg_acc, train_avg_loss, valid_avg_acc, valid_avg_loss))
                      
         training_stats.append(
@@ -246,7 +270,7 @@ def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_
         # === Save Model Parameters ===
         subprocess.call('cp ~/kobert/kobert_news_wiki_ko_cased-1087f8699e.spiece {}'.format(model_output_dir), shell=True)     
         bert_classifier.save_parameters(os.path.join(model_output_dir, 'kobert-nsmc.params'))
-        print("Model successfully saved at: {}".format(model_output_dir))        
+        logger.info("Model successfully saved at: {}".format(model_output_dir))        
         
         
 if __name__ =='__main__':
