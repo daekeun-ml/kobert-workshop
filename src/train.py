@@ -110,8 +110,6 @@ def evaluate_accuracy(model, data_iter, loss_function, ctx):
 def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_dir, model_output_dir):
 
     num_gpus = mx.context.num_gpus()
-    num_gpus = 1
-    
     batch_size *= num_gpus
     ctx = [mx.gpu(i) for i in range(num_gpus)]
       
@@ -193,10 +191,8 @@ def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_
                 offset = non_warmup_steps / (num_train_steps - num_warmup_steps)
                 new_lr = lr - offset * lr
             trainer.set_learning_rate(new_lr)
-#             new_lr = scheduler(step_num)
-#             trainer.set_learning_rate(new_lr)
-    
             losses = []
+            
             with mx.autograd.record():
                 # Load the data to the GPUs.
                 token_ids_ = gluon.utils.split_and_load(token_ids, ctx, even_split=False)
@@ -221,8 +217,7 @@ def train_model(num_epochs, batch_size, lr, log_interval, train_dir, validation_
             sum_loss = (sum([l.sum().asscalar() for l in losses]))/batch_size
             step_loss += sum_loss
             total_loss += sum_loss
-            step_num += 1            
-            #metric.update([label], [out])             
+            step_num += 1                      
 
             # Printing vital information
             if (batch_id + 1) % (log_interval) == 0:
