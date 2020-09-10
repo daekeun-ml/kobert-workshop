@@ -58,3 +58,9 @@ $ sudo sh cuda_10.2.89_440.33.01_linux.run
 - [Local Mode](module3.1_kobert_nsmc_deployment_local.ipynb)
 - [Script Mode](module3.2_kobert_nsmc_deployment_script.ipynb)
 - [Bring Your Own Container(BYOC)](module3.3_kobert_nsmc_deployment_byoc.ipynb)
+
+
+
+<br>
+
+[Privacy](https://aws.amazon.com/privacy/) | [Site terms](https://aws.amazon.com/terms/) | © 2020, Amazon Web Services, Inc. or its affiliates. All rights reserved.
